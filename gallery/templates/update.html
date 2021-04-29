@@ -1,0 +1,10 @@
+{% extends 'base.html'%}
+{% block content%}
+<h4 class='text-center alert alert-info'> Update Art</h4>
+<form action='' method='POST' enctype='multipart/form-data'>
+{% csrf_token%}
+{{form.as_p}}
+<input type='submit' class='btn btn-success' value='Update'>
+<a href="{% url 'show'%}" class ='btn btn-primary'>Home</a>
+</form>
+{%endblock content%}
