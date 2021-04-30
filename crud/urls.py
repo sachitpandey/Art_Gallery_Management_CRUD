@@ -15,17 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from gallery.views import add_view,delete_data,show_view,update_view#detail_view,create_view,
+from gallery.views import DeleteView,AddView ,show_view,UpdateView
 from django.conf.urls.static import static #
 from django.conf import settings#
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('<id>', detail_view ),
     path('',show_view,name='show'),
-    path('add', add_view,name='add'),
-    path('delete/<int:id>/', delete_data,name='delete'),
-    path('update/<int:id>/', update_view,name='update')
+    path('add', AddView.as_view(),name='add'),
+    path('delete/<int:id>/', DeleteView.as_view(),name='delete'),
+    path('update/<int:id>/', UpdateView.as_view(),name='update')
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 #
