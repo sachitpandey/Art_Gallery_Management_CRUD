@@ -1,73 +1,48 @@
 from django.shortcuts import render,HttpResponseRedirect
 
 # Create your views here.
-# relative import of forms
 from .models import Art
 from .forms import ArtForm
+from django.views.generic.base import TemplateView,RedirectView
+from django.views import View
   
-  
-'''def create_view(request):
-    # dictionary for initial data with 
-    # field names as keys
-    context ={}
-  
-    # add the dictionary during initialization
-    form = ArtForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-          
-    context['form']= form
-    return render(request, "create_view.html", context)
-
-def list_view(request):
-    # dictionary for initial data with 
-    # field names as keys
-    context ={}
-  
-    # add the dictionary during initialization
-    context["dataset"] = Art.objects.all()
-          
-    return render(request, "list_view.html", context)
-
-# pass id attribute from urls
-def detail_view(request, id):
-    # dictionary for initial data with 
-    # field names as keys
-    context ={}
-  
-    # add the dictionary during initialization
-    context["data"] = Art.objects.get(id = id)
-          
-    return render(request, "detail_view.html", context)'''
-
-def add_view(request):
-    if request.method=='POST':
-        fm = ArtForm(request.POST,request.FILES)
-        if fm.is_valid():
-            fm.save()
-            fm = ArtForm()
-    else:
-        fm = ArtForm()
-    stud = Art.objects.all()
-    return render(request, "add.html", {'form':fm,'info':stud})
-
-def delete_data(request,id):
-    if request.method == 'POST':
-        del_item = Art.objects.get(pk=id)
-        del_item.delete()
-        return HttpResponseRedirect('/')
 
 def show_view(request):
     info = Art.objects.all()
     return render(request,'show.html',{'info':info})
 
-def update_view(request,id):
-    if request.method=='POST':
+
+class AddView(TemplateView):
+    template_name = 'add.html'
+    def get_context_data(self,*args,**kwargs):
+        context = super().get_context_data(**kwargs)
+        fm = ArtForm()
+        stud = Art.objects.all()
+        context = {'info':stud,'form':fm}
+        return context
+    def post(self,request):
+        fm = ArtForm(request.POST,request.FILES)
+        if fm.is_valid():
+            fm.save()
+            fm = ArtForm()
+        return HttpResponseRedirect('/')
+
+class DeleteView(RedirectView):
+    url='/'
+    def get_redirect_url(self,*args,**kwargs):
+        del_id = kwargs['id']
+        Art.objects.get(pk=del_id).delete()
+        return super().get_redirect_url(*args,**kwargs)
+
+class UpdateView(View):
+    def get(self,request,id):
+        edit = Art.objects.get(pk=id)
+        fm = ArtForm(instance=edit) 
+        return render(request,'update.html',{'form':fm})
+
+    def post(self,request,id):
         edit = Art.objects.get(pk=id)
         fm = ArtForm(request.POST,request.FILES,instance=edit)
         if fm.is_valid():
             fm.save()
-    else:
-       edit = Art.objects.get(pk=id)
-       fm = ArtForm(instance=edit) 
-    return render(request,'update.html',{'form':fm})
+        return render(request,'update.html',{'form':fm})
